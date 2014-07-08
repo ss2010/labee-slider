@@ -4,7 +4,7 @@ Tags: Slider,Carousel,Bootstrap,Responsive Slider
 Donate link: http://sksinfotech.co.in
 Requires at least: 3.5 or above
 Tested up to: 3.9.1
-Stable tag: Beta
+Stable tag: 1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
