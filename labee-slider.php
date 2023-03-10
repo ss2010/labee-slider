@@ -3,7 +3,7 @@
 Plugin Name: Labee Slider
 Plugin URI: 
 Description: A simple plugin that integrates Slider with WordPress using custom post types!
-Author: SKS
+Author: ASHRAMTECH
 Version: 1.0
 Author URI: Your URL
 */
