@@ -1,18 +1,29 @@
 <?php
+/**
+ * Custom Meta Box functionality for Labee Slider Plugin.
+ *
+ * @package Labee_Slider
+ * @subpackage Metaboxes
+ */
 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
- * recives data about a form field and spits out the proper html
+ * Output proper HTML for a form field.
  *
- * @param	array					$field			array with various bits of information about the field
- * @param	string|int|bool|array	$meta			the saved data for this field
- * @param	array					$repeatable		if is this for a repeatable field, contains parant id and the current integar
+ * @param array              $field     Array with field information.
+ * @param string|int|bool    $meta      Saved data for this field.
+ * @param array              $repeatable Parent ID and current integer for repeatable fields.
  *
- * @return	string									html for the field
+ * @return string HTML for the field.
  */
 function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
-	if ( ! ( $field || is_array( $field ) ) )
+	if ( ! ( $field || is_array( $field ) ) ) {
 		return;
+	}
 	
 	// get field data
 	$type = isset( $field['type'] ) ? $field['type'] : null;
@@ -579,44 +590,41 @@ echo '});
 	}
 	
 	/**
-	 * outputs the meta box
+	 * Output the meta box callback.
+	 *
+	 * @since 2.0.0
 	 */
 	function meta_box_callback() {
-		// Use nonce for verification
+		// Use nonce for verification.
 		wp_nonce_field( 'custom_meta_box_nonce_action', 'custom_meta_box_nonce_field' );
-		
-		// Begin the field table and loop
+
+		// Begin the field table and loop.
 		echo '<table class="form-table meta_box">';
-		foreach ( $this->fields as $field) {
-			if ( $field['type'] == 'section' ) {
+		foreach ( $this->fields as $field ) {
+			if ( 'section' === $field['type'] ) {
 				echo '<tr>
-				<td colspan="2">
-				<h2>' . $field['label'] . '</h2>
-				</td>
+					<td colspan="2">
+						<h2>' . esc_html( $field['label'] ) . '</h2>
+					</td>
 				</tr>';
-			}
-
-			elseif ( $field['type'] == 'icons' ) {
-
+			} elseif ( 'icons' === $field['type'] ) {
 				echo '<tr>
-				<td  colspan="2">';
+					<td colspan="2">';
 
-				$meta = get_post_meta( get_the_ID(), $field['id'], true);
-				echo custom_meta_box_field( $field, $meta );
+				$meta = get_post_meta( get_the_ID(), $field['id'], true );
+				echo custom_meta_box_field( $field, $meta ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-				echo     '<td>
+				echo '</td>
 				</tr>';
-			}
-
-			else {
+			} else {
 				echo '<tr>
-				<th style="width:20%"><label for="' . $field['id'] . '">' . $field['label'] . '</label></th>
-				<td>';
+					<th style="width:20%"><label for="' . esc_attr( $field['id'] ) . '">' . esc_html( $field['label'] ) . '</label></th>
+					<td>';
 
-				$meta = get_post_meta( get_the_ID(), $field['id'], true);
-				echo custom_meta_box_field( $field, $meta );
+				$meta = get_post_meta( get_the_ID(), $field['id'], true );
+				echo custom_meta_box_field( $field, $meta ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-				echo     '<td>
+				echo '</td>
 				</tr>';
 			}
 		} // end foreach
@@ -624,50 +632,66 @@ echo '});
 	}
 	
 	/**
-	 * saves the captured data
+	 * Save captured metabox data.
+	 *
+	 * @param int $post_id Post ID.
+	 * @since 2.0.0
 	 */
 	function save_box( $post_id ) {
 		$post_type = get_post_type();
-		
-		// verify nonce
-		if ( ! isset( $_POST['custom_meta_box_nonce_field'] ) )
+
+		// Verify nonce.
+		if ( ! isset( $_POST['custom_meta_box_nonce_field'] ) ) {
 			return $post_id;
-		if ( ! ( in_array( $post_type, $this->page ) || wp_verify_nonce( $_POST['custom_meta_box_nonce_field'],  'custom_meta_box_nonce_action' ) ) ) 
+		}
+
+		if ( ! in_array( $post_type, $this->page, true ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['custom_meta_box_nonce_field'] ) ), 'custom_meta_box_nonce_action' ) ) {
 			return $post_id;
-		// check autosave
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
+		}
+
+		// Check autosave.
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return $post_id;
-		// check permissions
-		if ( ! current_user_can( 'edit_page', $post_id ) )
+		}
+
+		// Check permissions.
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return $post_id;
-		
-		// loop through fields and save the data
+		}
+
+		// Loop through fields and save the data.
 		foreach ( $this->fields as $field ) {
-			if( $field['type'] == 'section' ) {
+			if ( 'section' === $field['type'] ) {
 				$sanitizer = null;
 				continue;
 			}
-			if( in_array( $field['type'], array( 'tax_select', 'tax_checkboxes' ) ) ) {
-				// save taxonomies
-				if ( isset( $_POST[$field['id']] ) ) {
-					$term = $_POST[$field['id']];
+
+			if ( in_array( $field['type'], array( 'tax_select', 'tax_checkboxes' ), true ) ) {
+				// Save taxonomies.
+				if ( isset( $_POST[ $field['id'] ] ) ) {
+					$term = sanitize_text_field( wp_unslash( $_POST[ $field['id'] ] ) );
 					wp_set_object_terms( $post_id, $term, $field['id'] );
 				}
-			}
-			else {
-				// save the rest
+			} else {
+				// Save the rest.
 				$new = false;
 				$old = get_post_meta( $post_id, $field['id'], true );
-				if ( isset( $_POST[$field['id']] ) )
-					$new = $_POST[$field['id']];
-				if ( isset( $new ) && '' == $new && $old ) {
+
+				if ( isset( $_POST[ $field['id'] ] ) ) {
+					$new = wp_unslash( $_POST[ $field['id'] ] ); // phpcs:ignore WordPress.Security.ValidatedInput.InputNotSanitized
+				}
+
+				if ( isset( $new ) && '' === $new && $old ) {
 					delete_post_meta( $post_id, $field['id'], $old );
-				} elseif ( isset( $new ) && $new != $old ) {
+				} elseif ( isset( $new ) && $new !== $old ) {
 					$sanitizer = isset( $field['sanitizer'] ) ? $field['sanitizer'] : 'sanitize_text_field';
-					if ( is_array( $new ) )
+
+					if ( is_array( $new ) ) {
 						$new = meta_box_array_map_r( 'meta_box_sanitize', $new, $sanitizer );
-					else
+					} else {
 						$new = meta_box_sanitize( $new, $sanitizer );
+					}
+
 					update_post_meta( $post_id, $field['id'], $new );
 				}
 			}
