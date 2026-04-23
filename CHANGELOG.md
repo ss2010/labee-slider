@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Security improvements with input sanitization and output escaping
 - Better error handling and validation
 - Support for PHP 7.4+
+- Created CODE-CITATIONS.md documenting third-party code sources and licenses
 
 ### Changed
 - Complete plugin code refactor for modern WordPress coding standards
