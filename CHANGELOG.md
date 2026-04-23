@@ -41,6 +41,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed deprecated function `get_video_ID()` (replaced with `ls_get_video_id()`)
 - Removed unused `upload.js` from frontend enqueue
 
+#### JavaScript Modernization
+- **Refactored main.js:** Removed unused portfolio, contact form, and goto-top functionality
+- **Updated jQuery practices:** Replaced deprecated `$(window).load()` with `$(document).ready()`
+- **Added performance optimizations:** Debounced resize events for better performance
+- **Improved prettyPhoto integration:** Added proper configuration and error checking
+- **Modernized upload.js:** Eliminated code duplication, added proper error handling
+- **Added script localization:** Internationalized media uploader strings
+- **Enhanced code structure:** Modular functions with proper documentation
+- **Added strict mode:** `'use strict';` for better error catching
+
 ### Security
 - Added `wp_unslash()` and `sanitize_text_field()` for POST data
 - Improved nonce verification logic

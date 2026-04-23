@@ -1,61 +1,87 @@
-jQuery(function($) {
+/**
+ * Labee Slider - Main JavaScript
+ * Modern jQuery implementation for slider functionality
+ *
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 
-	//#main-slider
-	$(function(){
-		$('#main-slider.carousel').carousel({
-			interval: 8000
-		});
-	});
+(function($) {
+	'use strict';
 
-	$( '.centered' ).each(function( e ) {
-		$(this).css('margin-top',  ($('#main-slider').height() - $(this).height())/2);
-	});
+	/**
+	 * Initialize slider carousel
+	 */
+	function initSlider() {
+		var $slider = $('#main-slider.carousel');
 
-	$(window).resize(function(){
-		$( '.centered' ).each(function( e ) {
-			$(this).css('margin-top',  ($('#main-slider').height() - $(this).height())/2);
-		});
-	});
-
-	//portfolio
-	$(window).load(function(){
-		$portfolio_selectors = $('.portfolio-filter >li>a');
-		if($portfolio_selectors!='undefined'){
-			$portfolio = $('.portfolio-items');
-			$portfolio.isotope({
-				itemSelector : 'li',
-				layoutMode : 'fitRows'
-			});
-			$portfolio_selectors.on('click', function(){
-				$portfolio_selectors.removeClass('active');
-				$(this).addClass('active');
-				var selector = $(this).attr('data-filter');
-				$portfolio.isotope({ filter: selector });
-				return false;
+		if ($slider.length) {
+			$slider.carousel({
+				interval: 8000,
+				pause: 'hover'
 			});
 		}
-	});
+	}
 
-	//contact form
-	var form = $('.contact-form');
-	form.submit(function () {
-		$this = $(this);
-		$.post($(this).attr('action'), function(data) {
-			$this.prev().text(data.message).fadeIn().delay(3000).fadeOut();
-		},'json');
-		return false;
-	});
+	/**
+	 * Center slider content vertically
+	 */
+	function centerSliderContent() {
+		$('.centered').each(function() {
+			var $this = $(this),
+				$slider = $('#main-slider'),
+				sliderHeight = $slider.height(),
+				contentHeight = $this.height();
 
-	//goto top
-	$('.gototop').click(function(event) {
-		event.preventDefault();
-		$('html, body').animate({
-			scrollTop: $("body").offset().top
-		}, 500);
-	});	
+			if (sliderHeight > 0 && contentHeight > 0) {
+				var marginTop = (sliderHeight - contentHeight) / 2;
+				$this.css('margin-top', marginTop + 'px');
+			}
+		});
+	}
 
-	//Pretty Photo
-	$("a[rel^='prettyPhoto']").prettyPhoto({
-		social_tools: false
-	});	
-});
+	/**
+	 * Initialize prettyPhoto for image galleries
+	 */
+	function initPrettyPhoto() {
+		if (typeof $.fn.prettyPhoto === 'function') {
+			$("a[rel^='prettyPhoto']").prettyPhoto({
+				social_tools: false,
+				theme: 'pp_default',
+				horizontal_padding: 20,
+				opacity: 0.8,
+				show_title: false,
+				allow_resize: true,
+				default_width: 500,
+				default_height: 344
+			});
+		}
+	}
+
+	/**
+	 * Handle window resize events
+	 */
+	function handleResize() {
+		centerSliderContent();
+	}
+
+	/**
+	 * Initialize all slider functionality
+	 */
+	function init() {
+		initSlider();
+		centerSliderContent();
+		initPrettyPhoto();
+
+		// Bind resize event with debounce for performance
+		var resizeTimer;
+		$(window).on('resize', function() {
+			clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(handleResize, 250);
+		});
+	}
+
+	// Initialize when DOM is ready
+	$(document).ready(init);
+
+})(jQuery);

@@ -70,40 +70,22 @@ function ls_enqueue_scripts() {
 		true
 	);
 
-	// Enqueue Styles.
-	wp_enqueue_style(
-		'bootstrap-min',
-		LS_PLUGIN_URL . 'css/bootstrap.min.css',
-		array(),
-		LS_VERSION
+	wp_enqueue_script(
+		'labee-slider-upload',
+		LS_PLUGIN_URL . 'js/upload.js',
+		array( 'jquery' ),
+		LS_VERSION,
+		true
 	);
 
-	wp_enqueue_style(
-		'animate',
-		LS_PLUGIN_URL . 'css/animate.css',
-		array(),
-		LS_VERSION
-	);
-
-	wp_enqueue_style(
-		'prettyPhoto',
-		LS_PLUGIN_URL . 'css/prettyPhoto.css',
-		array(),
-		LS_VERSION
-	);
-
-	wp_enqueue_style(
-		'fontawesome',
-		LS_PLUGIN_URL . 'css/font-awesome.min.css',
-		array(),
-		LS_VERSION
-	);
-
-	wp_enqueue_style(
-		'labee-slider-style',
-		LS_PLUGIN_URL . 'css/style.css',
-		array( 'bootstrap-min' ),
-		LS_VERSION
+	// Localize script for media uploader
+	wp_localize_script(
+		'labee-slider-upload',
+		'labee_slider_media',
+		array(
+			'title'       => esc_html__( 'Select Image', LS_TEXT_DOMAIN ),
+			'button_text' => esc_html__( 'Use this image', LS_TEXT_DOMAIN ),
+		)
 	);
 }
 add_action( 'wp_enqueue_scripts', 'ls_enqueue_scripts' );
