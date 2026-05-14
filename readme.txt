@@ -9,7 +9,7 @@ Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-A responsive and SEO-optimized WordPress slider plugin using custom post types with modern coding standards.
+A responsive and SEO-optimized WordPress slider plugin using custom post types with modern coding standards and Gutenberg block support.
 
 == Description ==
 
@@ -21,8 +21,12 @@ Labee Slider is a lightweight, responsive slider plugin for WordPress. Create SE
 * Boxed and positioned text layouts
 * Automatic carousel controllers
 * Bootstrap-powered responsive design
+* **NEW:** Gutenberg Block Editor support
 
 The plugin uses WordPress custom post types and metaboxes for easy slider management from the WordPress admin dashboard.
+
+**Gutenberg Block Usage:**
+In the WordPress Block Editor, simply add the "Labee Slider" block to display your sliders. The block will automatically show all published sliders.
 
 == Installation ==
 
@@ -33,13 +37,20 @@ The plugin uses WordPress custom post types and metaboxes for easy slider manage
 
 == Usage ==
 
-**In WordPress Posts/Pages:**
+**In WordPress Block Editor (Gutenberg):**
+1. Open any post or page in the Block Editor
+2. Click the "+" button to add a new block
+3. Search for "Labee Slider" or browse the "Media" category
+4. Add the Labee Slider block to your content
+5. The block will automatically display all published sliders
+
+**In WordPress Classic Editor:**
 Use the shortcode `[ls_slider]` to display the slider
 
 **In Theme Templates:**
 Add the following PHP code to your template:
 ```php
-<?php 
+<?php
 if ( function_exists( 'ls_slider' ) ) {
     ls_slider();
 }
@@ -75,6 +86,8 @@ Yes! Labee Slider uses Bootstrap CSS framework for full responsive design across
 * Improved code documentation and comments
 * Fixed deprecated function usage
 * Better error handling and validation
+* **NEW:** Added Gutenberg Block Editor support
+* **NEW:** Proper CSS and JS asset enqueuing
 * Requires PHP 7.4+ and WordPress 5.0+
 
 = 1.0 =

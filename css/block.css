@@ -1,0 +1,58 @@
+/**
+ * Labee Slider Block Frontend Styles
+ *
+ * @package Labee_Slider
+ * @since 2.0.0
+ */
+
+.wp-block-labee-slider {
+	margin: 0 auto;
+	max-width: 100%;
+}
+
+.wp-block-labee-slider .labee-slider-block-placeholder {
+	background-color: #f9f9f9;
+	border: 2px dashed #ccc;
+	border-radius: 4px;
+	padding: 30px;
+	text-align: center;
+	margin: 20px 0;
+}
+
+.wp-block-labee-slider .labee-slider-block-placeholder p {
+	margin: 0 0 15px 0;
+	font-size: 16px;
+	color: #666;
+}
+
+.wp-block-labee-slider .labee-slider-block-placeholder a {
+	display: inline-block;
+	background-color: #007cba;
+	color: #fff;
+	padding: 10px 20px;
+	text-decoration: none;
+	border-radius: 4px;
+	font-weight: 500;
+	transition: background-color 0.2s ease;
+}
+
+.wp-block-labee-slider .labee-slider-block-placeholder a:hover {
+	background-color: #005a87;
+}
+
+/* Ensure proper spacing when block is used in content */
+.wp-block-labee-slider + * {
+	margin-top: 1.5em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.wp-block-labee-slider {
+		margin: 0 -15px;
+	}
+
+	.wp-block-labee-slider .labee-slider-block-placeholder {
+		padding: 20px;
+		margin: 10px 15px;
+	}
+}

@@ -87,12 +87,51 @@ function ls_enqueue_scripts() {
 			'button_text' => esc_html__( 'Use this image', LS_TEXT_DOMAIN ),
 		)
 	);
+
+	// Enqueue Styles.
+	wp_enqueue_style(
+		'bootstrap-css',
+		LS_PLUGIN_URL . 'css/bootstrap.min.css',
+		array(),
+		LS_VERSION
+	);
+
+	wp_enqueue_style(
+		'animate-css',
+		LS_PLUGIN_URL . 'css/animate.css',
+		array(),
+		LS_VERSION
+	);
+
+	wp_enqueue_style(
+		'font-awesome',
+		LS_PLUGIN_URL . 'css/font-awesome.min.css',
+		array(),
+		LS_VERSION
+	);
+
+	wp_enqueue_style(
+		'prettyPhoto-css',
+		LS_PLUGIN_URL . 'css/prettyPhoto.css',
+		array(),
+		LS_VERSION
+	);
+
+	wp_enqueue_style(
+		'labee-slider-style',
+		LS_PLUGIN_URL . 'css/style.css',
+		array( 'bootstrap-css' ),
+		LS_VERSION
+	);
 }
 add_action( 'wp_enqueue_scripts', 'ls_enqueue_scripts' );
 
 
 // Include metabox functionality.
 require_once LS_PLUGIN_DIR . 'metaboxes/meta_box.php';
+
+// Include Gutenberg block functionality.
+require_once LS_PLUGIN_DIR . 'blocks.php';
 
 /**
  * Get post thumbnail URL.
