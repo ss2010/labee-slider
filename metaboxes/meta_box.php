@@ -73,10 +73,10 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 		echo '<input type="checkbox" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" ' . checked( $meta, true, false ) . ' value="1" />
 		<label for="' . esc_attr( $id ) . '">' . $desc . '</label>';
 		break;
-		// select, chosen
-		case 'select':
-		case 'chosen':
-		echo '<select name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '"' , $type == 'chosen' ? ' class="chosen"' : '' , isset( $multiple ) && $multiple == true ? ' multiple="multiple"' : '' , '>
+			// select, chosen
+			case 'select':
+			case 'chosen':
+			echo '<select name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '"' , 'chosen' === $type ? ' class="chosen"' : '' , isset( $multiple ) && $multiple == true ? ' multiple="multiple"' : '' , '>
 					'; // Select One  <option value="">Select One</option>';
 					foreach ( $options as $option )
 						echo '<option' . selected( $meta, $option['value'], false ) . ' value="' . $option['value'] . '">' . $option['label'] . '</option>';
@@ -97,10 +97,10 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 					add_thickbox();
 					echo '<ul class="meta_box_items icons">';
 					echo '<li><label class="label">' . $label . '</label></li>';
-					echo '<li class="display-icon"><i class="'.$meta.'"></i></li>';
+					echo '<li class="display-icon"><i class="' . esc_attr( $meta ) . '"></i></li>';
 
 
-					echo '<li><input type="text" class="hidden-textbox" name="' . esc_attr( $name ) . '" value="' . $meta . '" /></li>';
+					echo '<li><input type="text" class="hidden-textbox" name="' . esc_attr( $name ) . '" value="' . esc_attr( $meta ) . '" /></li>';
 
 
 					echo '<li>';
@@ -131,10 +131,10 @@ function custom_meta_box_field( $field, $meta = null, $repeatable = null ) {
 					<label for="' . esc_attr( $id ) . '-' . $option['value'] . '">' . $option['label'] . '</label></li>';
 					echo '</ul>' . $desc;
 					break;
-		// color
-					case 'color':
-					$meta = $meta ? $meta : '#';
-					echo '<input type="text" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" value="' . $meta . '" size="10" />
+				// color
+				case 'color':
+				$meta = $meta ? $meta : '#';
+				echo '<input type="text" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" value="' . esc_attr( $meta ) . '" size="10" />
 					<br />' . $desc;
 					echo '<div id="colorpicker-' . esc_attr( $id ) . '"></div>
 					<script type="text/javascript">
@@ -150,7 +150,7 @@ break;
 case 'post_select':
 case 'post_list':
 case 'post_chosen':
-echo '<select data-placeholder="Select One" name="' . esc_attr( $name ) . '[]" id="' . esc_attr( $id ) . '"' , $type == 'post_chosen' ? ' class="chosen"' : '' , isset( $multiple ) && $multiple == true ? ' multiple="multiple"' : '' , '>
+			echo '<select data-placeholder="Select One" name="' . esc_attr( $name ) . '[]" id="' . esc_attr( $id ) . '"' , 'post_chosen' === $type ? ' class="chosen"' : '' , isset( $multiple ) && true === $multiple ? ' multiple="multiple"' : '' , '>
 					<option value=""></option>'; // Select One
 					$posts = get_posts( array( 'post_type' => $post_type, 'posts_per_page' => -1, 'orderby' => 'name', 'order' => 'ASC' ) );
 					foreach ( $posts as $item )
@@ -179,7 +179,7 @@ echo '<select data-placeholder="Select One" name="' . esc_attr( $name ) . '[]" i
 						if ( is_array( $meta ) ) {
 							$items = explode( ',', $meta[$area['id']] );
 							foreach ( $items as $item ) {
-								$output = $display == 'thumbnail' ? get_the_post_thumbnail( $item, array( 204, 30 ) ) : get_the_title( $item ); 
+								$output = 'thumbnail' === $display ? get_the_post_thumbnail( $item, array( 204, 30 ) ) : get_the_title( $item ); 
 								echo '<li id="' . $item . '">' . $output . '</li>';
 							}
 						}
@@ -199,7 +199,7 @@ echo '<select data-placeholder="Select One" name="' . esc_attr( $name ) . '[]" i
 			echo '<ul class="post_drop_sort_source sort_list">
 			<li class="post_drop_sort_area_name">Available ' . $label . '</li>';
 			foreach ( $posts as $item ) {
-				$output = $display == 'thumbnail' ? get_the_post_thumbnail( $item->ID, array( 204, 30 ) ) : get_the_title( $item->ID ); 
+				$output = 'thumbnail' === $display ? get_the_post_thumbnail( $item->ID, array( 204, 30 ) ) : get_the_title( $item->ID ); 
 				echo '<li id="' . $item->ID . '">' . $output . '</li>';
 			}
 			echo '</ul>';
@@ -238,7 +238,7 @@ echo '<select data-placeholder="Select One" name="' . esc_attr( $name ) . '[]" i
 					break;
 		// slider
 					case 'slider':
-					$value = $meta != '' ? intval( $meta ) : '0';
+					$value = ! empty( $meta ) ? intval( $meta ) : '0';
 					echo '<div id="' . esc_attr( $id ) . '-slider"></div>
 					<input type="text" name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" value="' . $value . '" size="5" />
 					<br />' . $desc;
@@ -281,7 +281,7 @@ echo '<select data-placeholder="Select One" name="' . esc_attr( $name ) . '[]" i
 					<tbody>';
 					$i = 0;
 			// create an empty array
-					if ( $meta == '' || $meta == array() ) {
+					if ( empty( $meta ) || ( is_array( $meta ) && empty( $meta ) ) ) {
 						$keys = wp_list_pluck( $repeatable_fields, 'id' );
 						$meta = array ( array_fill_keys( $keys, null ) );
 					}
@@ -326,7 +326,7 @@ echo '<select data-placeholder="Select One" name="' . esc_attr( $name ) . '[]" i
  */
 function meta_box_find_field_type( $needle, $haystack ) {
 	foreach ( $haystack as $h )
-		if ( isset( $h['type'] ) && $h['type'] == 'repeatable' )
+		if ( isset( $h['type'] ) && 'repeatable' === $h['type'] )
 			return meta_box_find_field_type( $needle, $h['repeatable_fields'] );
 		elseif ( ( isset( $h['type'] ) && $h['type'] == $needle ) || ( isset( $h['repeatable_type'] ) && $h['repeatable_type'] == $needle ) )
 			return true;
@@ -411,7 +411,7 @@ function meta_box_array_map_r( $func, $meta, $sanitizer ) {
 	$meta = array_values( $meta );
 	
 	foreach( $meta as $key => $array ) {
-		if ( $array == '' )
+		if ( empty( $array ) )
 			continue;
 		/**
 		 * some values are stored as array, we only want multidimensional ones
@@ -558,7 +558,7 @@ break;
 					// slider
 case 'slider' :
 $value = get_post_meta( get_the_ID(), $field['id'], true );
-if ( $value == '' )
+if ( empty( $value ) )
 	$value = $field['min'];
 echo '
 $( "#' . $field['id'] . '-slider" ).slider({
@@ -612,7 +612,7 @@ echo '});
 					<td colspan="2">';
 
 				$meta = get_post_meta( get_the_ID(), $field['id'], true );
-				echo custom_meta_box_field( $field, $meta ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo wp_kses_post( custom_meta_box_field( $field, $meta ) );
 
 				echo '</td>
 				</tr>';
@@ -622,7 +622,7 @@ echo '});
 					<td>';
 
 				$meta = get_post_meta( get_the_ID(), $field['id'], true );
-				echo custom_meta_box_field( $field, $meta ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo wp_kses_post( custom_meta_box_field( $field, $meta ) );
 
 				echo '</td>
 				</tr>';

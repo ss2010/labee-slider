@@ -110,10 +110,12 @@ function ls_get_thumb_url( $post_id ) {
 }
 
 /**
- * Extract video ID from YouTube or Vimeo URL.
+ * Safely extract video ID from YouTube or Vimeo URL.
+ *
+ * Validates that the URL is from a trusted video platform before extracting the ID.
  *
  * @param string $link Video URL.
- * @return string|bool Video ID or false if unable to extract.
+ * @return string|bool Video ID or false if unable to extract or invalid URL.
  * @since 2.0.0
  */
 function ls_get_video_id( $link ) {
@@ -121,17 +123,31 @@ function ls_get_video_id( $link ) {
 		return false;
 	}
 
-	$path = trim( wp_parse_url( $link, PHP_URL_PATH ), '/' );
-	$query_string = wp_parse_url( $link, PHP_URL_QUERY );
-
-	if ( ! empty( $query_string ) ) {
-		parse_str( $query_string, $output );
-		if ( ! empty( $output['v'] ) ) {
-			return sanitize_text_field( $output['v'] );
-		}
+	// Only process YouTube and Vimeo URLs for security
+	if ( ! preg_match( '/(youtube\.com|youtu\.be|vimeo\.com)/', $link ) ) {
+		return false;
 	}
 
-	return sanitize_text_field( $path );
+	$video_id = '';
+
+	// YouTube short URL (youtu.be/VIDEO_ID)
+	if ( preg_match( '/youtu\.be\/([a-zA-Z0-9_-]{11})/', $link, $matches ) ) {
+		$video_id = $matches[1];
+	}
+	// YouTube long URL (youtube.com/watch?v=VIDEO_ID)
+	elseif ( preg_match( '/youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11})/', $link, $matches ) ) {
+		$video_id = $matches[1];
+	}
+	// Vimeo URL (vimeo.com/VIDEO_ID)
+	elseif ( preg_match( '/vimeo\.com\/(\d+)/', $link, $matches ) ) {
+		$video_id = $matches[1];
+	}
+
+	if ( empty( $video_id ) ) {
+		return false;
+	}
+
+	return sanitize_text_field( $video_id );
 }
  
 //Slider Shortcode
@@ -144,6 +160,7 @@ function ls_get_video_id( $link ) {
 function ls_get_slider() {
 	$args = array(
 		'post_type'      => 'ls_slider',
+		'post_status'    => 'publish',
 		'orderby'        => 'menu_order',
 		'order'          => 'ASC',
 		'posts_per_page' => -1,
@@ -178,27 +195,13 @@ function ls_get_slider() {
 					$bg_image_url = get_post_meta( $slider->ID, 'slider_background_image', true );
 					
 					$embed_code = '';
-					if ( $full_img ) {
-						$embed_code = '<img src="' . esc_url( $full_img[0] ) . '" alt="' . esc_attr( $slider->post_title ) . '">';
-					} elseif ( ! empty( $video_url ) ) {
-						if ( 'youtube' === $video_type ) {
-							$video_id = ls_get_video_id( $video_url );
-							$embed_code = '<iframe width="640" height="480" src="' . esc_url( 'https://www.youtube.com/embed/' . $video_id . '?rel=0' ) . '" frameborder="0" allowfullscreen></iframe>';
-						} elseif ( 'vimeo' === $video_type ) {
-							$video_id = ls_get_video_id( $video_url );
-							$embed_code = '<iframe src="' . esc_url( 'https://player.vimeo.com/video/' . $video_id . '?title=0&amp;byline=0&amp;portrait=0&amp;color=a22c2f' ) . '" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>';
-						}
-					}
-
-					$columns = ! empty( $embed_code );
-					$background_image = '';
-					
-					if ( ! empty( $bg_image_url ) ) {
-						$bg_url = wp_get_attachment_url( intval( $bg_image_url ) );
-						$background_image = 'background-image: url(' . esc_url( $bg_url ) . ');';
-					}
-				?>
-					<div class="item <?php echo ( 0 === $key ) ? 'active' : ''; ?>" style="<?php echo esc_attr( $background_image ); ?>">
+				if ( $full_img && is_array( $full_img ) && ! empty( $full_img[0] ) ) {
+					$embed_code = '<img src="' . esc_url( $full_img[0] ) . '" alt="' . esc_attr( $slider->post_title ) . '">';
+				} elseif ( ! empty( $video_url ) ) {
+					$video_id = ls_get_video_id( $video_url );
+					if ( $video_id && 'youtube' === $video_type ) {
+						$embed_code = '<iframe width="640" height="480" src="' . esc_url( 'https://www.youtube.com/embed/' . $video_id . '?rel=0' ) . '" frameborder="0" allowfullscreen></iframe>';
+					} elseif ( $video_id && 'vimeo' === $video_type ) {
 						<div class="container">
 							<div class="row">
 								<div class="<?php echo ( $columns ) ? 'col-sm-6' : 'col-sm-12'; ?>">
