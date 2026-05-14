@@ -408,6 +408,3 @@ new Custom_Add_Meta_Box(
 	'ls_slider',
 	true
 );
-
-<?php
-// End of Labee Slider Plugin
